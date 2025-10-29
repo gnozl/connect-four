@@ -142,6 +142,24 @@ int main(int argc, char** argv) {
             return 0;
         }));
 
+        // Student Strategy 5 - TODO: Implement your strategy using a lambda
+        players.push_back(Player("Strategy 5", [](const ConnectFour& game, char symbol) {
+            // TODO: Replace this with your own strategy!
+            std::cerr << "ERROR: Strategy 5 not implemented!\n";
+            std::cerr << "Please implement this strategy using a lambda function.\n";
+            exit(1);
+            return 0;
+        }));
+
+        // Student Strategy 6 - TODO: Implement your strategy using a lambda
+        players.push_back(Player("Strategy 6", [](const ConnectFour& game, char symbol) {
+            // TODO: Replace this with your own strategy!
+            std::cerr << "ERROR: Strategy 6 not implemented!\n";
+            std::cerr << "Please implement this strategy using a lambda function.\n";
+            exit(1);
+            return 0;
+        }));
+
         // Run tournament with 10 games per matchup
         runTournament(players, 10);
 

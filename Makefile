@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -std=c++11 -Wall -Wextra
 
 # Target executable
-TARGET = tournament
+TARGET = connect-four
 
 # Source files
 SOURCES = ConnectFour.cpp Player.cpp strategies.cpp
