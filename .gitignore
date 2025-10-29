@@ -2,6 +2,9 @@
 connect-four
 tournament
 
+# build directory
+build
+
 # Object files
 *.o
 *.obj
