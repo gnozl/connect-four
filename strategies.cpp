@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <vector>
 #include <string>
-#include <cstdlib>
+#include <random>
 
 // Play a single game between two players
 void playGame(Player& player1, Player& player2, ConnectFour& game, bool verbose = true) {
@@ -105,59 +105,111 @@ int main(int argc, char** argv) {
             return 0;
         }));
 
-        // Student Strategy 1 - TODO: Implement your strategy using a lambda
+        // Student Strategy 1 - RANDOM
         players.push_back(Player("Strategy 1", [](const ConnectFour& game, char symbol) {
-            // TODO: Replace this with your own strategy!
-            // This is just a placeholder that will crash
-            std::cerr << "ERROR: Strategy 1 not implemented!\n";
-            std::cerr << "Please implement this strategy using a lambda function.\n";
-            exit(1);
-            return 0;
+            int col;
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_int_distribution<> dist(0, 6);
+
+            do {col = dist(mt);} while(!game.isValidMove(col));
+
+            return col;
         }));
 
-        // Student Strategy 2 - TODO: Implement your strategy using a lambda
+        // Student Strategy 2 - //TODO: implement strat2
         players.push_back(Player("Strategy 2", [](const ConnectFour& game, char symbol) {
-            // TODO: Replace this with your own strategy!
-            std::cerr << "ERROR: Strategy 2 not implemented!\n";
-            std::cerr << "Please implement this strategy using a lambda function.\n";
-            exit(1);
-            return 0;
+            int col;
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_int_distribution<> dist(0, 6);
+
+            do {col = dist(mt);} while(!game.isValidMove(col));
+
+            return col;
         }));
 
-        // Student Strategy 3 - TODO: Implement your strategy using a lambda
+        // Student Strategy 3 - TODO: Implement strat3
         players.push_back(Player("Strategy 3", [](const ConnectFour& game, char symbol) {
-            // TODO: Replace this with your own strategy!
-            std::cerr << "ERROR: Strategy 3 not implemented!\n";
-            std::cerr << "Please implement this strategy using a lambda function.\n";
-            exit(1);
-            return 0;
+            int col;
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_int_distribution<> dist(0, 6);
+
+            do {col = dist(mt);} while(!game.isValidMove(col));
+
+            return col;
         }));
 
-        // Student Strategy 4 - TODO: Implement your strategy using a lambda
+        // Student Strategy 4 - Beth Le
         players.push_back(Player("Strategy 4", [](const ConnectFour& game, char symbol) {
-            // TODO: Replace this with your own strategy!
-            std::cerr << "ERROR: Strategy 4 not implemented!\n";
-            std::cerr << "Please implement this strategy using a lambda function.\n";
-            exit(1);
-            return 0;
+            bool firstMove = true;
+            static int last_opponent_move = -1;
+            int column;
+            if (firstMove) {
+                firstMove = false;
+                do {
+                    column = rand() % 7;
+                } while (!game.isValidMove(column));
+                last_opponent_move = column;
+                return column;
+            }
+
+            if (last_opponent_move != -1 && game.isValidMove(last_opponent_move)) {
+                column = last_opponent_move;
+            } else {
+
+                if (last_opponent_move > 0 && game.isValidMove(last_opponent_move - 1)) {
+                    column = last_opponent_move - 1;
+                } else if (last_opponent_move < 6 && game.isValidMove(last_opponent_move + 1)) {
+                    column = last_opponent_move + 1;
+                } else {
+
+                    for (int i = 0; i < 7; ++i) {
+                        if (game.isValidMove(i)) {
+                            column = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            last_opponent_move = column;
+
+            return column;
         }));
 
-        // Student Strategy 5 - TODO: Implement your strategy using a lambda
-        players.push_back(Player("Strategy 5", [](const ConnectFour& game, char symbol) {
-            // TODO: Replace this with your own strategy!
-            std::cerr << "ERROR: Strategy 5 not implemented!\n";
-            std::cerr << "Please implement this strategy using a lambda function.\n";
-            exit(1);
-            return 0;
-        }));
-
-        // Student Strategy 6 - TODO: Implement your strategy using a lambda
+        // Student Strategy 5 - Leo Boon
         players.push_back(Player("Strategy 6", [](const ConnectFour& game, char symbol) {
-            // TODO: Replace this with your own strategy!
-            std::cerr << "ERROR: Strategy 6 not implemented!\n";
-            std::cerr << "Please implement this strategy using a lambda function.\n";
-            exit(1);
-            return 0;
+                int col;
+            for (col = 0; col < 7; col++) {
+                ConnectFour temp = game;
+                temp.makeMove(col);
+                if (temp.getWinner() == symbol) {
+                    return col;
+                }
+                temp.makeMove(col);
+                if (temp.getWinner() != symbol) {
+                    return col-1;
+                }
+                temp.makeMove(col);
+                if (!temp.isFull()) {
+                    return col+1;
+                }
+            }
+            return col;
+        }));
+
+        // Student Strategy 6 - TODO: Implement strat6
+        players.push_back(Player("Strategy 6", [](const ConnectFour& game, char symbol) {
+            int col;
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_int_distribution<> dist(0, 6);
+
+            do {col = dist(mt);} while(!game.isValidMove(col));
+
+            return col;
         }));
 
         // Run tournament with 10 games per matchup
