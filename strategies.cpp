@@ -180,9 +180,9 @@ int main(int argc, char** argv) {
         }));
 
         // Student Strategy 5 - Leo Boon
-        players.push_back(Player("Strategy 6", [](const ConnectFour& game, char symbol) {
+        players.push_back(Player("Strategy 5", [](const ConnectFour& game, char symbol) {
                 int col;
-            for (col = 0; col < 7; col++) {
+                for (col = 0; col < 7; col++) {
                 ConnectFour temp = game;
                 temp.makeMove(col);
                 if (temp.getWinner() == symbol) {
@@ -197,7 +197,12 @@ int main(int argc, char** argv) {
                     return col+1;
                 }
             }
-            return col;
+            for (int col = 0; col < 7; col++) {
+                if (game.isValidMove(col)) {
+                    return col;
+                }
+            };
+            return 0;
         }));
 
         // Student Strategy 6 - TODO: Implement strat6
