@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
         }));
 
         // Student Strategy 1 - RANDOM
-        players.push_back(Player("Strategy 1", [](const ConnectFour& game, char symbol) {
+        players.push_back(Player("Strategy 1 - Random", [](const ConnectFour& game, char symbol) {
             int col;
             std::random_device rd;
             std::mt19937 mt(rd());
@@ -117,76 +117,61 @@ int main(int argc, char** argv) {
             return col;
         }));
 
-        // Student Strategy 2 - // Gerardo - Check for winning move, or block opponent from winning, otherwise random
-        players.push_back(Player("Strategy 2", [](const ConnectFour& game, char symbol) {
-            int col;
-
-            //Create a temporary board
-            ConnectFour temp = ConnectFour();
-            std::vector<int> x_array;
-            std::vector<int> o_array;
-
-            // Check each column for a winning move
+        // Student Strategy 2 - // Play center, then play next to other plays
+        players.push_back(Player("Strategy 2 - Center", [](const ConnectFour& game, char symbol) {
+            if (game.getMoveCount() < 4) {
+                return 3;
+            }
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_int_distribution<> dist(-1, 1);
             for (int col = 0; col < 7; col++) {
-
-                temp.reset();
-                x_array.clear();
-                o_array.clear();
-
-                //Find move on real board
-                for (int i = 0; i < 6; i++) {
-                    for (int j = 0; j < 7; j++) {
-                        if (game.getCell(i,j) == 'X') {
-                            x_array.push_back(j);
-                        } else if (game.getCell(i,j) == 'O') {
-                            o_array.push_back(j);
+                    for (int row = 0; row < 6; row++) {
+                        if (game.getCell(row,col) != ' ') {
+                            int tempInt = dist(mt) + col;
+                            if (game.isValidMove(tempInt)) {return tempInt;}
                         }
                     }
                 }
-                //play moves on temp board
-                char turn = 'X';
-                while (!x_array.empty() && !o_array.empty()) {
-                    if (turn == 'O') {
-                        turn = 'X';
-                        temp.makeMove(x_array.front());
-                        x_array.erase(x_array.begin());
-                    } else if (turn == 'X') {
-                        turn = 'O';
-                        temp.makeMove(o_array.front());
-                        o_array.erase(o_array.begin());
-                    }
-                }
+            // Play random
+            std::random_device rd2;
+            std::mt19937 mt2(rd());
+            std::uniform_int_distribution<> dist2(0, 6);
+            int randomInt;
+            do {randomInt = dist2(mt2);} while(!game.isValidMove(randomInt));
+            return randomInt;
+        }));
 
-                //test column for a win
-                temp.makeMove(col);
-                char winner = temp.getWinner();
-                if (winner == symbol) {
-                    return col;
-                }
-                if (winner == 'X' || winner == 'O') {
-                    return col;
+        // Student Strategy 3 - Jay Kress Jones
+        players.push_back(Player("Strategy 3 - 3 Stage Move", [](const ConnectFour& game, char symbol) {
+            // Check if next move will win game
+            for (int col = 0; col < 7; col++) {
+                if (game.isValidMove(col)) {
+                    ConnectFour tempGame = game;
+                    tempGame.makeMove(col);
+                    if (tempGame.getWinner() == symbol) {
+                        return col;
+                    }
                 }
             }
 
-            // If no winning move found, make a random move
-            std::random_device rd;
-            std::mt19937 mt(rd());
-            std::uniform_int_distribution<> dist(0, 6);
+            // Check if opposing player move will win, if so then block it.
+            char opponentSymbol = (symbol == 'X') ? 'O' : 'X';
+            for (int col = 0; col < 7; col++) {
+                if (game.isValidMove(col)) {
+                    ConnectFour tempGame = game;
+                    tempGame.makeMove(col);
+                    if (tempGame.getWinner() == opponentSymbol) {
+                        return col;
+                    }
+                }
+            }
 
-            do {col = dist(mt);} while(!game.isValidMove(col));
-
-            return col;
-        }));
-
-        // Student Strategy 3 - TODO: Implement strat3
-        players.push_back(Player("Strategy 3", [](const ConnectFour& game, char symbol) {
+            // If neither moves apply, play random move.
             int col;
-            std::random_device rd;
-            std::mt19937 mt(rd());
-            std::uniform_int_distribution<> dist(0, 6);
-
-            do {col = dist(mt);} while(!game.isValidMove(col));
-
+            do {
+                col = rand() % 7;
+            } while (!game.isValidMove(col));
             return col;
         }));
 
@@ -231,32 +216,8 @@ int main(int argc, char** argv) {
         // Student Strategy 5 - Leo Boon
         players.push_back(Player("Strategy 5", [](const ConnectFour& game, char symbol) {
             int col;
-            for (col = 0; col < 7; col++) {  // For every move
-                ConnectFour temp = ConnectFour(); // Simulate the current board
-                std::vector<int> x_array;
-                std::vector<int> o_array;
-                for (int i = 0; i < 6; i++) {
-                    for (int j = 0; j < 7; j++) {
-                        if (game.getCell(i,j) == 'X') {
-                            x_array.push_back(j);
-                        } else if (game.getCell(i,j) == 'O') {
-                            o_array.push_back(j);
-                        }
-                    }
-                }
-                char turn = 'X';
-                while (!x_array.empty() && !o_array.empty()) {
-                    if (turn == 'O') {
-                        turn = 'X';
-                        temp.makeMove(x_array.front());
-                        x_array.erase(x_array.begin());
-                    } else {
-                        turn = 'O';
-                        temp.makeMove(o_array.front());
-                        o_array.erase(o_array.begin());
-                    }
-                }
-
+            for (col = 0; col < 7; col++) {
+                ConnectFour temp = game;
                 temp.makeMove(col);
                 if (temp.getWinner() == symbol) {
                     return col;
@@ -270,26 +231,107 @@ int main(int argc, char** argv) {
                     return col+1;
                 }
             }
-
-            for (int col = 0; col < 7; col++) {
-                if (game.isValidMove(col)) {
-                    return col;
-                }
-            };
-        return 0;
+            return col;
         }));
 
-        // Student Strategy 6 - TODO: Implement strat6
-        players.push_back(Player("Strategy 6", [](const ConnectFour& game, char symbol) {
-            int col;
+
+        // Student Strategy 6 - Gerardo
+        players.push_back(Player("Strategy 6 - Win / Block", [](const ConnectFour& game, char symbol) {
+            int returnColumn;
+            //CREATE TEMPORARY BOARD
+            char testBoard[6][7] = {};
+
+            //SET PLAYER ORDER
+            char first;
+            char second;
+            if (symbol == 'X') {
+                first = 'X';
+                second = 'O';
+            } else if (symbol == 'O') {
+                first = 'O';
+                second = 'X';
+            }
+            char players[2] = {first, second};
+
+            // FOR EACH PLAYER, CHECK EACH COLUMN
+            for (char player : players) {
+                for (int returnColumn = 0; returnColumn < 7; returnColumn++) {
+                    //std::cout << "testing " << player << " in column " << returnColumn << std::endl;
+
+                    // MAKE A COPY OF REAL BOARD
+                    for (int i = 0; i < 6; i++) {
+                        for (int j = 0; j < 7; j++) {
+                            testBoard[i][j] = game.getCell(i,j);
+                        }
+                    }
+
+                    // MAKE A MOVE IN LOWEST EMPTY SPOT IN CURRENT COLUMN
+                    for (int row = 5; row >= 0; row--) {
+                        if (testBoard[row][returnColumn] == ' ') {
+                            testBoard[row][returnColumn] = player;
+                            break;
+                        }
+                    }
+
+                    // CHECK FOR WINNER
+
+                    // Check horizontal
+                    for (int row = 0; row < 6; row++) {
+                        for (int col = 0; col < 4; col++) {
+                            if (testBoard[row][col] != ' ' &&
+                                testBoard[row][col] == testBoard[row][col+1] &&
+                                testBoard[row][col] == testBoard[row][col+2] &&
+                                testBoard[row][col] == testBoard[row][col+3]) {
+                                return returnColumn;
+                            }
+                        }
+                    }
+
+                    // Check vertical
+                    for (int row = 0; row < 3; row++) {
+                        for (int col = 0; col < 7; col++) {
+                            if (testBoard[row][col] != ' ' &&
+                                testBoard[row][col] == testBoard[row+1][col] &&
+                                testBoard[row][col] == testBoard[row+2][col] &&
+                                testBoard[row][col] == testBoard[row+3][col]) {
+                                return returnColumn;
+                            }
+                        }
+                    }
+                    // Check diagonal (down-right)
+                    for (int row = 0; row < 3; row++) {
+                        for (int col = 0; col < 4; col++) {
+                            if (testBoard[row][col] != ' ' &&
+                                testBoard[row][col] == testBoard[row+1][col+1] &&
+                                testBoard[row][col] == testBoard[row+2][col+2] &&
+                                testBoard[row][col] == testBoard[row+3][col+3]) {
+                                return returnColumn;
+                            }
+                        }
+                    }
+                    // Check diagonal (down-left)
+                    for (int row = 0; row < 3; row++) {
+                        for (int col = 3; col < 7; col++) {
+                            if (testBoard[row][col] != ' ' &&
+                                testBoard[row][col] == testBoard[row+1][col-1] &&
+                                testBoard[row][col] == testBoard[row+2][col-2] &&
+                                testBoard[row][col] == testBoard[row+3][col-3]) {
+                                return returnColumn;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // If no winning move found, make a random move
             std::random_device rd;
             std::mt19937 mt(rd());
             std::uniform_int_distribution<> dist(0, 6);
 
-            do {col = dist(mt);} while(!game.isValidMove(col));
+            do {returnColumn = dist(mt);} while(!game.isValidMove(returnColumn));
 
-            return col;
-        }));
+            return returnColumn;
+            }));
 
         // Run tournament with 10 games per matchup
         runTournament(players, 10);
@@ -316,60 +358,14 @@ int main(int argc, char** argv) {
 
         Player player2("Player 2", [](const ConnectFour& game, char symbol) {
             int col;
+            std::cout << game.toString();
+            std::cout << "Player " << symbol << ", enter column (0-6): ";
+            std::cin >> col;
 
-            //Create a temporary board
-            ConnectFour temp = ConnectFour();
-            std::vector<int> x_array;
-            std::vector<int> o_array;
-
-            // Check each column for a winning move
-            for (int col = 0; col < 7; col++) {
-
-                temp.reset();
-                x_array.clear();
-                o_array.clear();
-
-                //Find move on real board
-                for (int i = 0; i < 6; i++) {
-                    for (int j = 0; j < 7; j++) {
-                        if (game.getCell(i,j) == 'X') {
-                            x_array.push_back(j);
-                        } else if (game.getCell(i,j) == 'O') {
-                            o_array.push_back(j);
-                        }
-                    }
-                }
-                //play moves on temp board
-                char turn = 'X';
-                while (!x_array.empty() && !o_array.empty()) {
-                    if (turn == 'O') {
-                        turn = 'X';
-                        temp.makeMove(x_array.front());
-                        x_array.erase(x_array.begin());
-                    } else if (turn == 'X') {
-                        turn = 'O';
-                        temp.makeMove(o_array.front());
-                        o_array.erase(o_array.begin());
-                    }
-                }
-
-                //test column for a win
-                temp.makeMove(col);
-                char winner = temp.getWinner();
-                if (winner == symbol) {
-                    return col;
-                }
-                if (winner == 'X' || winner == 'O') {
-                    return col;
-                }
+            while (!game.isValidMove(col)) {
+                std::cout << "Invalid move! Enter column (0-6): ";
+                std::cin >> col;
             }
-
-            // If no winning move found, make a random move
-            std::random_device rd;
-            std::mt19937 mt(rd());
-            std::uniform_int_distribution<> dist(0, 6);
-
-            do {col = dist(mt);} while(!game.isValidMove(col));
 
             return col;
             });
