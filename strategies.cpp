@@ -142,101 +142,8 @@ int main(int argc, char** argv) {
             return randomInt;
         }));
 
-        // Student Strategy 3 - Jay Kress Jones
-        players.push_back(Player("Strategy 3 - 3 Stage Move", [](const ConnectFour& game, char symbol) {
-            // Check if next move will win game
-            for (int col = 0; col < 7; col++) {
-                if (game.isValidMove(col)) {
-                    ConnectFour tempGame = game;
-                    tempGame.makeMove(col);
-                    if (tempGame.getWinner() == symbol) {
-                        return col;
-                    }
-                }
-            }
-
-            // Check if opposing player move will win, if so then block it.
-            char opponentSymbol = (symbol == 'X') ? 'O' : 'X';
-            for (int col = 0; col < 7; col++) {
-                if (game.isValidMove(col)) {
-                    ConnectFour tempGame = game;
-                    tempGame.makeMove(col);
-                    if (tempGame.getWinner() == opponentSymbol) {
-                        return col;
-                    }
-                }
-            }
-
-            // If neither moves apply, play random move.
-            int col;
-            do {
-                col = rand() % 7;
-            } while (!game.isValidMove(col));
-            return col;
-        }));
-
-        // Student Strategy 4 - Beth Le
-        players.push_back(Player("Strategy 4", [](const ConnectFour& game, char symbol) {
-            bool firstMove = true;
-            static int last_opponent_move = -1;
-            int column;
-            if (firstMove) {
-                firstMove = false;
-                do {
-                    column = rand() % 7;
-                } while (!game.isValidMove(column));
-                last_opponent_move = column;
-                return column;
-            }
-
-            if (last_opponent_move != -1 && game.isValidMove(last_opponent_move)) {
-                column = last_opponent_move;
-            } else {
-
-                if (last_opponent_move > 0 && game.isValidMove(last_opponent_move - 1)) {
-                    column = last_opponent_move - 1;
-                } else if (last_opponent_move < 6 && game.isValidMove(last_opponent_move + 1)) {
-                    column = last_opponent_move + 1;
-                } else {
-
-                    for (int i = 0; i < 7; ++i) {
-                        if (game.isValidMove(i)) {
-                            column = i;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            last_opponent_move = column;
-
-            return column;
-        }));
-
-        // Student Strategy 5 - Leo Boon
-        players.push_back(Player("Strategy 5", [](const ConnectFour& game, char symbol) {
-            int col;
-            for (col = 0; col < 7; col++) {
-                ConnectFour temp = game;
-                temp.makeMove(col);
-                if (temp.getWinner() == symbol) {
-                    return col;
-                }
-                temp.makeMove(col);
-                if (temp.getWinner() != symbol) {
-                    return col-1;
-                }
-                temp.makeMove(col);
-                if (!temp.isFull()) {
-                    return col+1;
-                }
-            }
-            return col;
-        }));
-
-
-        // Student Strategy 6 - Gerardo
-        players.push_back(Player("Strategy 6 - Win / Block", [](const ConnectFour& game, char symbol) {
+        // Student Strategy 3 - Gerardo
+        players.push_back(Player("Gerardo Gonzalez", [](const ConnectFour& game, char symbol) {
             int returnColumn;
             //CREATE TEMPORARY BOARD
             char testBoard[6][7] = {};
@@ -332,6 +239,99 @@ int main(int argc, char** argv) {
 
             return returnColumn;
             }));
+
+        // Student Strategy 4 - Jay Kress Jones
+        players.push_back(Player("Jay Kress Jones", [](const ConnectFour& game, char symbol) {
+            // Check if next move will win game
+            for (int col = 0; col < 7; col++) {
+                if (game.isValidMove(col)) {
+                    ConnectFour tempGame = game;
+                    tempGame.makeMove(col);
+                    if (tempGame.getWinner() == symbol) {
+                        return col;
+                    }
+                }
+            }
+
+            // Check if opposing player move will win, if so then block it.
+            char opponentSymbol = (symbol == 'X') ? 'O' : 'X';
+            for (int col = 0; col < 7; col++) {
+                if (game.isValidMove(col)) {
+                    ConnectFour tempGame = game;
+                    tempGame.makeMove(col);
+                    if (tempGame.getWinner() == opponentSymbol) {
+                        return col;
+                    }
+                }
+            }
+
+            // If neither moves apply, play random move.
+            int col;
+            do {
+                col = rand() % 7;
+            } while (!game.isValidMove(col));
+            return col;
+        }));
+
+        // Student Strategy 5 - Beth Le
+        players.push_back(Player("Beth Le", [](const ConnectFour& game, char symbol) {
+            bool firstMove = true;
+            static int last_opponent_move = -1;
+            int column;
+            if (firstMove) {
+                firstMove = false;
+                do {
+                    column = rand() % 7;
+                } while (!game.isValidMove(column));
+                last_opponent_move = column;
+                return column;
+            }
+
+            if (last_opponent_move != -1 && game.isValidMove(last_opponent_move)) {
+                column = last_opponent_move;
+            } else {
+
+                if (last_opponent_move > 0 && game.isValidMove(last_opponent_move - 1)) {
+                    column = last_opponent_move - 1;
+                } else if (last_opponent_move < 6 && game.isValidMove(last_opponent_move + 1)) {
+                    column = last_opponent_move + 1;
+                } else {
+
+                    for (int i = 0; i < 7; ++i) {
+                        if (game.isValidMove(i)) {
+                            column = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            last_opponent_move = column;
+
+            return column;
+        }));
+
+        // Student Strategy 6 - Leo Boon
+        players.push_back(Player("Leon Boon", [](const ConnectFour& game, char symbol) {
+            int col;
+            for (col = 0; col < 7; col++) {
+                ConnectFour temp = game;
+                temp.makeMove(col);
+                if (temp.getWinner() == symbol) {
+                    return col;
+                }
+                temp.makeMove(col);
+                if (temp.getWinner() != symbol) {
+                    return col-1;
+                }
+                temp.makeMove(col);
+                if (!temp.isFull()) {
+                    return col+1;
+                }
+            }
+            return col;
+        }));
+
 
         // Run tournament with 10 games per matchup
         runTournament(players, 10);
