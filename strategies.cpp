@@ -267,19 +267,20 @@ int main(int argc, char** argv) {
 
             // If neither moves apply, play random move.
             int col;
-            do {
-                col = rand() % 7;
-            } while (!game.isValidMove(col));
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_int_distribution<> dist(0, 6);
+
+            do {col = dist(mt);} while(!game.isValidMove(col));
+
             return col;
         }));
 
         // Student Strategy 5 - Beth Le
         players.push_back(Player("Beth Le", [](const ConnectFour& game, char symbol) {
-            bool firstMove = true;
             static int last_opponent_move = -1;
             int column;
-            if (firstMove) {
-                firstMove = false;
+            if (game.getMoveCount() == 0) {
                 do {
                     column = rand() % 7;
                 } while (!game.isValidMove(column));
@@ -311,26 +312,26 @@ int main(int argc, char** argv) {
             return column;
         }));
 
-        // Student Strategy 6 - Leo Boon
-        players.push_back(Player("Leon Boon", [](const ConnectFour& game, char symbol) {
-            int col;
-            for (col = 0; col < 7; col++) {
-                ConnectFour temp = game;
-                temp.makeMove(col);
-                if (temp.getWinner() == symbol) {
-                    return col;
-                }
-                temp.makeMove(col);
-                if (temp.getWinner() != symbol) {
-                    return col-1;
-                }
-                temp.makeMove(col);
-                if (!temp.isFull()) {
-                    return col+1;
-                }
-            }
-            return col;
-        }));
+        // // Student Strategy 6 - Leo Boon
+        // players.push_back(Player("Leo Boon", [](const ConnectFour& game, char symbol) {
+        //     int col;
+        //     for (col = 0; col < 7; col++) {
+        //         ConnectFour temp = game;
+        //         temp.makeMove(col);
+        //         if (temp.getWinner() == symbol) {
+        //             return col;
+        //         }
+        //         temp.makeMove(col);
+        //         if (temp.getWinner() != symbol) {
+        //             return col-1;
+        //         }
+        //         temp.makeMove(col);
+        //         if (!temp.isFull()) {
+        //             return col+1;
+        //         }
+        //     }
+        //     return col;
+        // }));
 
 
         // Run tournament with 10 games per matchup
